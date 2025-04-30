@@ -10,7 +10,7 @@ function ErrorComponent({ error }: { error: Error }) {
     <div className="flex flex-col gap-2">
       <h3>Error caught by boundary</h3>
       <p>{error.message}</p>
-      <pre>{error.stack}</pre>
+      <pre className="overflow-scroll">{error.stack}</pre>
     </div>
   );
 }
