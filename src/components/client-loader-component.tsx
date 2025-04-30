@@ -2,21 +2,11 @@
 
 import { JSX, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { renderClientComponent } from "@/actions/server-action";
-import { ErrorBoundary } from "next/dist/client/components/error-boundary";
-
-function ErrorComponent({ error }: { error: Error }) {
-  return (
-    <div className="flex flex-col gap-2 max-w-[500px]">
-      <h3>Error caught by boundary</h3>
-      <p>{error.message}</p>
-      <pre className="overflow-scroll">{error.stack}</pre>
-    </div>
-  );
-}
+import { useServerActions } from "./server-actions-provider";
 
 export function ClientLoaderComponent() {
   const [component, setComponent] = useState<JSX.Element | null>(null);
+  const { renderClientComponent } = useServerActions();
 
   function handleClick() {
     async function load() {
@@ -30,12 +20,10 @@ export function ClientLoaderComponent() {
   }
 
   return (
-    <ErrorBoundary errorComponent={ErrorComponent}>
-      <div className="flex flex-col gap-2 border border-solid border-foreground p-4 rounded-2xl min-w-[500px]">
-        <h3>Load client component via server action</h3>
-        <Button onClick={handleClick}>test</Button>
-        {!component ? "waiting" : component}
-      </div>
-    </ErrorBoundary>
+    <div className="flex flex-col gap-2 border border-solid border-foreground p-4 rounded-2xl min-w-[500px]">
+      <h3>Load client component via server action</h3>
+      <Button onClick={handleClick}>test</Button>
+      {!component ? "waiting" : component}
+    </div>
   );
 }
