@@ -1,13 +1,9 @@
 "use server";
 
-import dynamic from "next/dynamic";
 import { ClientCounterComponent } from "@/components/client-counter-component";
 
-const DynamicClientCounter = dynamic(() => import('@/components/client-counter-component').then(mod => mod.ClientCounterComponent), {
-  loading: () => <p>Loading...</p>
-})
-
-// x
+// x blows up with
+// Error: Could not find the module "[project]/src/components/client-counter-component.tsx#ClientCounterComponent" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
 export async function renderClientComponent() {
   return (
     <div className="flex flex-col gap-2">
@@ -15,9 +11,4 @@ export async function renderClientComponent() {
       <ClientCounterComponent />
     </div>
   );
-}
-
-// x
-export async function renderDynamicClientComponent() {
-  return <DynamicClientCounter />;
 }
