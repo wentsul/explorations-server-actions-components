@@ -33,10 +33,10 @@ export function useServerAction<Action extends keyof ServerActionsContext>(
   const action = actions[actionName];
 
   return useQuery({
-    queryKey: ["server-actions", actionName],
+    queryKey: ["server-actions", actionName, ...args],
     queryFn: async () => {
-      // @ts-expect-error any cast ok
-      const component = await action(...(args as any));
+      // @ts-expect-error args is typed
+      const component = await action(...args);
       return component;
     },
   });
