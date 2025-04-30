@@ -5,7 +5,7 @@ import type {
   renderCounterComponent,
   renderDefaultCounterComponent,
 } from "@/actions/server-action";
-import { createContext, PropsWithChildren, useContext } from "react";
+import { createContext, JSX, PropsWithChildren, useContext } from "react";
 
 interface ServerActionsContext {
   renderCounterComponent: typeof renderCounterComponent;
@@ -27,19 +27,45 @@ export function useServerActions() {
 
 export function useServerAction<Action extends keyof ServerActionsContext>(
   actionName: Action,
-  ...args: Parameters<ServerActionsContext[Action]>
+  props: Parameters<ServerActionsContext[Action]>[0],
 ): UseQueryResult<Awaited<ReturnType<ServerActionsContext[Action]>>> {
   const actions = useServerActions();
   const action = actions[actionName];
 
   return useQuery({
-    queryKey: ["server-actions", actionName, ...args],
+    queryKey: ["server-actions", actionName, props],
     queryFn: async () => {
       // @ts-expect-error args is typed
-      const component = await action(...args);
+      const component = await action(props);
       return component;
     },
   });
+}
+
+export function dynamicServerComponent<
+  Action extends keyof ServerActionsContext,
+>(
+  actionName: Action,
+  options: {
+    loading?: () => JSX.Element;
+  } = {},
+) {
+  function DynamicServerComponent(
+    props: Parameters<ServerActionsContext[Action]>[0],
+  ): JSX.Element | null {
+    const { data, isLoading } = useServerAction(actionName, props);
+    if (isLoading) {
+      return options.loading?.() ?? null;
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    return data;
+  }
+
+  return DynamicServerComponent;
 }
 
 export function ServerActionsProvider({

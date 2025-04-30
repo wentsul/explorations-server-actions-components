@@ -11,7 +11,11 @@ export async function renderCounterComponent() {
   );
 }
 
-export async function renderDefaultCounterComponent(defaultCount: number) {
+export async function renderDefaultCounterComponent({
+  defaultCount,
+}: {
+  defaultCount: number;
+}) {
   return (
     <div className="flex flex-col gap-2">
       <div>Some server content</div>
