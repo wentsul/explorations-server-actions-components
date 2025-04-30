@@ -35,7 +35,8 @@ export function useServerAction<Action extends keyof ServerActionsContext>(
   return useQuery({
     queryKey: ["server-actions", actionName],
     queryFn: async () => {
-      const component = await action(...args);
+      // @ts-expect-error any cast ok
+      const component = await action(...(args as any));
       return component;
     },
   });
