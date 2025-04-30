@@ -1,21 +1,44 @@
 "use client";
 
-import type { renderClientComponent } from "@/actions/server-action";
+import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import type {
+  renderCounterComponent,
+  renderDefaultCounterComponent,
+} from "@/actions/server-action";
 import { createContext, PropsWithChildren, useContext } from "react";
 
 interface ServerActionsContext {
-  renderClientComponent: typeof renderClientComponent;
+  renderCounterComponent: typeof renderCounterComponent;
+  renderDefaultCounterComponent: typeof renderDefaultCounterComponent;
 }
 
 export const ServerActionsContext = createContext<ServerActionsContext>({
   // @ts-expect-error can't set actual functions here.
-  renderClientComponent: null,
+  renderCounterComponent: null,
+  // @ts-expect-error can't set actual functions here.
+  renderDefaultCounterComponent: null,
 });
 
 export default ServerActionsContext;
 
 export function useServerActions() {
   return useContext(ServerActionsContext);
+}
+
+export function useServerAction<Action extends keyof ServerActionsContext>(
+  actionName: Action,
+  ...args: Parameters<ServerActionsContext[Action]>
+): UseQueryResult<Awaited<ReturnType<ServerActionsContext[Action]>>> {
+  const actions = useServerActions();
+  const action = actions[actionName];
+
+  return useQuery({
+    queryKey: ["server-actions", actionName],
+    queryFn: async () => {
+      const component = await action(...args);
+      return component;
+    },
+  });
 }
 
 export function ServerActionsProvider({
