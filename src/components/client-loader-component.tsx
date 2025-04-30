@@ -7,7 +7,7 @@ import { ErrorBoundary } from "next/dist/client/components/error-boundary";
 
 function ErrorComponent({ error }: { error: Error }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 max-w-[500px]">
       <h3>Error caught by boundary</h3>
       <p>{error.message}</p>
       <pre className="overflow-scroll">{error.stack}</pre>
